@@ -2,13 +2,13 @@
 
 //L298N Driver Pin 
 
-#define MOTOR_ENA ?  // Replace the ? with the GPIO pin you selected to connect ENA
-#define MOTOR_IN1 ?  // Replace the ? with the GPIO pin you selected to connect IN2
-#define MOTOR_IN2 ?  // Replace the ? with the GPIO pin you selected to connect IN2
+#define MOTOR_ENA 21  // Replace the ? with the GPIO pin you selected to connect ENA
+#define MOTOR_IN1 4  // Replace the ? with the GPIO pin you selected to connect IN1
+#define MOTOR_IN2 16  // Replace the ? with the GPIO pin you selected to connect IN2
 
 //Encoder Pin 
-#define ENCODER_PINA ? // Replace the ? with the GPIO pin you selected to connect encoder A
-#define ENCODER_PINB ? // Replace the ? with the GPIO pin you selected to connect encoder B
+#define ENCODER_PINA 33 // Replace the ? with the GPIO pin you selected to connect encoder A
+#define ENCODER_PINB 14 // Replace the ? with the GPIO pin you selected to connect encoder B
 
 //Encoder Counter
 volatile long encoderCount = 0; 
@@ -17,7 +17,7 @@ String command;
 
 //PID constants
 //** Modify these value for Task 2-4
-double kp = 0.1;
+double kp = 1;
 double ki = 0.1;
 double kd = 0.1;
 
@@ -88,7 +88,7 @@ void serialGraph(){
 // **Some value needs to be changed in order to use this
 double getPosition() {
   // Calculate the current position based on encoder count
-  position = float(encoderCount)*360.0/1000.0; // Replace 1000.0 with the actual counts per revolution
+  position = float(encoderCount)*360.0/(-931); // Replace 1000.0 with the actual counts per revolution
 
   if (position<0)
   {position = position + 360; // Ensure position is positive
@@ -100,20 +100,21 @@ double getPosition() {
 void setup() {
   
 /* pin mode for pins connected with L298N driver  */
-  ??? 
+  pinMode(MOTOR_IN1, OUTPUT);  // Set IN1 as an output pin
+  pinMode(MOTOR_IN2, OUTPUT);  // Set IN2 as an output pin 
 
 // encoder A pin mode for interrupt
   pinMode(ENCODER_PINA, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA), encoderInterrupt, CHANGE);
 
 /*encoder B pin mode */   
-  ???
+  pinMode(ENCODER_PINB, INPUT);  // Set B as an input pin
 
   //Configure PID value for different Task 
   TaskConfig(); 
 
 /* set up baud rate  */
-  ???
+  Serial.begin(2400); //Define baud
 }
 
 void loop() {
@@ -124,11 +125,13 @@ void loop() {
         // control the motor based on PID output
         if(output<0){
            /*movement direction set when output<0 */
-           ???
+           digitalWrite(MOTOR_IN1, LOW);
+             digitalWrite(MOTOR_IN2, HIGH);
           }
           else{
             /*movement direction set when output>=0*/
-           ???
+           digitalWrite(MOTOR_IN1, HIGH);
+             digitalWrite(MOTOR_IN2, LOW);
           }
         analogWrite(MOTOR_ENA,(128+int(abs(output))));   // Replace 128 with the the threshold value for your motor to move
         
@@ -136,7 +139,7 @@ void loop() {
   serialGraph();
    // Reset encoder count
   if (position > 360 || position < 0) {
-    encoderCount = ?;
+    encoderCount = 0;
   } 
 delay(50);
 }
