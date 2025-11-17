@@ -17,9 +17,9 @@ String command;
 
 //PID constants
 //** Modify these value for Task 2-4
-double kp = 1;
-double ki = 0.1;
-double kd = 0.1;
+double kp = 4;
+double ki = 0.000000000000001;
+double kd = 1;
 
 //PID Varibles 
 unsigned long currentTime, previousTime;
@@ -32,7 +32,7 @@ double cumError, rateError;
 // set desired position to 90 degrees
 double setPoint=90.0;
 
-int Task = 2 ; //Change this according to the task that you are doing 
+int Task = 4 ; //Change this according to the task that you are doing 
 
 void TaskConfig(){
   if(Task == 2){
@@ -88,7 +88,7 @@ void serialGraph(){
 // **Some value needs to be changed in order to use this
 double getPosition() {
   // Calculate the current position based on encoder count
-  position = float(encoderCount)*360.0/(-931); // Replace 1000.0 with the actual counts per revolution
+  position = float(encoderCount)*360.0/(931); // Replace 1000.0 with the actual counts per revolution
 
   if (position<0)
   {position = position + 360; // Ensure position is positive
@@ -114,7 +114,7 @@ void setup() {
   TaskConfig(); 
 
 /* set up baud rate  */
-  Serial.begin(2400); //Define baud
+  Serial.begin(9600); //Define baud
 }
 
 void loop() {
